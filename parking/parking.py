@@ -186,6 +186,26 @@ def generate_qr_code(html_path, plate_number):
     # Display the QR code in a popup window
     qr_img.show()
 
+# def generate_qr_code(html_filename, plate_number):
+#     # Use the Netlify URL instead of the local file path
+#     netlify_url = 'https://pesu-nav-parking.netlify.app/'
+    
+#     # Construct the URL for the HTML page on Netlify
+#     url = f"{netlify_url}/{html_filename}"
+    
+#     qr = qrcode.QRCode(version=1, box_size=10, border=5)
+#     qr.add_data(url)
+#     qr.make(fit=True)
+#     qr_img = qr.make_image(fill='black', back_color='white')
+
+#     # Save QR code image
+#     sanitized_plate_number = re.sub(r'[<>:"/\\|?*]', "", plate_number)
+#     qr_image_path = os.path.join(image_directory, f"{sanitized_plate_number}_qr.png")
+#     qr_img.save(qr_image_path)
+
+#     # Display the QR code in a popup window
+#     qr_img.show()
+
 def process_parking(image):
     plate_number = capture_plate_number(image)
     if plate_number:
