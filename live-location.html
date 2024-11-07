@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Location</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_7QuhgU65PneUuaJthoCL_siM-wPjoGU&callback=initMap&libraries=&v=weekly" async></script>
+  <style>
+    #map { height: 70vh; width: 100%; margin-bottom: 20px; }
+    button { font-size: 18px; padding: 10px 20px; cursor: pointer; border-radius: 5px; background-color: #4CAF50; color: white; border: none; }
+    h1 { text-align: center; }
+    .center { display: flex; justify-content: center; margin-top: 20px; }
+    .compass { position: absolute; top: 10px; right: 10px; z-index: 5; }
+    .compass button { margin: 5px; padding: 10px; border-radius: 5px; background-color: #4CAF50; color: white; border: none; }
+  </style>
+</head>
+<body>
+  <h1>Live Directions</h1>
+  <div id="map"></div>
+
+  <!-- Compass Button -->
+  <div class="compass">
+    <button id="northBtn">North</button>
+    <button id="southBtn">South</button>
+    <button id="recenterButton">Recenter</button>
+  </div>
+
+  <!-- Button to start live directions -->
+  <div class="center">
+    <button id="startButton" disabled>Start Navigation</button>
+  </div>
+
+  <script>
+    let map, userMarker, destinationMarker, directionsService, directionsRenderer, destinationCoords, watchId;
+
+    function initMap() {
+      // Get destination from URL parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const destination = urlParams.get('destination');
+      
+      if (destination === 'parking') {
+        destinationCoords = { lat: 12.861050337208786, lng: 77.66529792699902 }; // Coordinates of PesU Parking Lot
+      } else if (destination === 'mechanical') {
+        destinationCoords = { lat: 12.86165454226525, lng: 77.66402962092867 }; // Coordinates of Mechanical Block
+      } else if (destination === 'library') {
+        destinationCoords = { lat: 12.861873472143001, lng: 77.66407399024524 }; // Coordinates of Library
+      } else if (destination === 'medical') {
+        destinationCoords = { lat: 12.862911256519139, lng: 77.66607267053878 }; // Coordinates of Medical Sciences and Research
+      }
+
+      // Try to get user's location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+          const userLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+
+          // Initialize the map
+          map = new google.maps.Map(document.getElementById('map'), {
+            center: userLocation,
+            zoom: 15
+          });
+
+          // Set user location marker (human body icon)
+          userMarker = new google.maps.Marker({
+            position: userLocation,
+            map: map,
+            icon: {
+              url: 'human.png', // Human icon
+              scaledSize: new google.maps.Size(30, 30)
+            },
+            title: 'Your Location'
+          });
+
+          // Set destination marker
+          destinationMarker = new google.maps.Marker({
+            position: destinationCoords,
+            map: map,
+            title: 'Destination'
+          });
+
+          // Initialize directions services
+          directionsService = new google.maps.DirectionsService();
+          directionsRenderer = new google.maps.DirectionsRenderer();
+          directionsRenderer.setMap(map);
+
+          // Enable the "Start Navigation" button
+          document.getElementById('startButton').disabled = false;
+        }, () => {
+          alert("Geolocation failed or not available.");
+        });
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+
+    // Function to start navigation when user clicks "Start"
+    document.getElementById('startButton').onclick = function() {
+      if (navigator.geolocation) {
+        watchId = navigator.geolocation.watchPosition(position => {
+          const userLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+
+          // Update user location marker position
+          userMarker.setPosition(userLocation);
+
+          // Center the map towards user's movement
+          map.setCenter(userLocation);
+
+          // Request directions
+          const request = {
+            origin: userLocation,
+            destination: destinationCoords,
+            travelMode: 'WALKING'
+          };
+
+          directionsService.route(request, (result, status) => {
+            if (status == 'OK') {
+              directionsRenderer.setDirections(result);
+            }
+          });
+
+          // Check if the user has reached the destination (within 20 meters)
+          const distanceToDestination = calculateDistance(userLocation, destinationCoords);
+          if (distanceToDestination < 0.02) {
+            alert("You have arrived at your destination!");
+            navigator.geolocation.clearWatch(watchId); // Stop watching the position
+          }
+        }, () => {
+          alert("Geolocation failed while updating position.");
+        });
+      }
+    };
+
+    // Function to calculate the distance between two locations
+    function calculateDistance(loc1, loc2) {
+      const R = 6371; // Radius of the Earth in kilometers
+      const dLat = (loc2.lat - loc1.lat) * Math.PI / 180;
+      const dLng = (loc2.lng - loc1.lng) * Math.PI / 180;
+      const a = 
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(loc1.lat * Math.PI / 180) * Math.cos(loc2.lat * Math.PI / 180) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c; // Distance in kilometers
+      return distance;
+    }
+
+    // Compass Button functionality
+    document.getElementById('northBtn').onclick = function() {
+      map.setHeading(0); // North direction
+    };
+
+    document.getElementById('southBtn').onclick = function() {
+      map.setHeading(180); // South direction
+    };
+
+    document.getElementById('recenterButton').onclick = () => {
+      map.setCenter(userMarker.getPosition());
+    };
+  </script>
+</body>
+</html>
+

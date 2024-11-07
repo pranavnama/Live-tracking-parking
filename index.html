@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pes University Navigation</title>
+  <img src="pes1-removebg-preview.png"><br>
+  <h1>Welcome To PES University</h1>
+  <style>
+    /* Background setup */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: lightblue;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: rgb(233, 166, 10);
+    }
+
+    /* Header styling */
+    h1 {
+      font-size: 48px;
+      margin-bottom: 40px;
+      animation: fadeInDown 1.5s ease-out;
+      text-shadow: 2px 2px 8px rgba(237, 234, 228, 0.927);
+      color: darkblue;
+    }
+
+    /* Button styling */
+    button {
+      font-size: 20px;
+      padding: 15px 40px;
+      margin: 20px;
+      border: none;
+      cursor: pointer;
+      border-radius: 12px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: rgb(242, 146, 13);
+      transition: transform 0.3s ease, background-color 0.3s ease;
+      box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Button hover animation */
+    button:hover {
+      background-color: rgba(240, 128, 8, 0.2);
+      transform: translateY(-10px);
+      box-shadow: 4px 8px 20px rgba(0, 0, 0, 0.6);
+      color: black;
+    }
+
+    /* Button click animation */
+    button:active {
+      transform: translateY(2px);
+    }
+
+    /* Fade in animation */
+    @keyframes fadeInDown {
+      0% {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <button id="parking">Parking Lot</button>
+  <button id="mechanical">Mechanical Block</button>
+  <button id="medical">Institute of Medical Sciences and Research</button>
+  
+
+  <script>
+    document.getElementById('parking').onclick = function() {
+      window.location.href = 'live-location.html?destination=parking';
+    }
+    document.getElementById('mechanical').onclick = function() {
+      window.location.href = 'live-location.html?destination=mechanical';
+    }
+    document.getElementById('medical').onclick = function() {
+      window.location.href = 'live-location.html?destination=medical';
+    }
+  </script>
+</body>
+</html>
